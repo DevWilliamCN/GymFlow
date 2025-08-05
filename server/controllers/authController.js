@@ -6,7 +6,6 @@ const register = async (req, res) => {
   const { firstName, lastName, dateOfBirth, email, password } = req.body;
 
   try {
-    // Validaciones
     if (!firstName || !lastName || !dateOfBirth || !email || !password) {
       return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
@@ -74,4 +73,8 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const protectedRoute = (req, res) => {
+  res.status(200).json({ message: 'Ruta protegida accedida correctamente' });
+};
+
+module.exports = { register, login, protectedRoute };
