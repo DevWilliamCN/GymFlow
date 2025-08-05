@@ -6,12 +6,13 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ Seguridad con Helmet
-app.use(helmet({
-  contentSecurityPolicy: false, // Desactivar si usás inline styles/scripts
-}));
+// 🔒 Seguridad
+app.use(helmet({ contentSecurityPolicy: false }));
 
-// ✅ Dominios permitidos
+// 🌍 Mostrar entorno actual
+console.log('🌎 Modo:', process.env.NODE_ENV);
+
+// 🌐 Dominios permitidos
 const allowedOrigins = [
   'http://localhost:5173',
   'https://gym-flow-devwilliamcns-projects.vercel.app',
@@ -35,16 +36,16 @@ app.use(cors({
   credentials: true,
 }));
 
-// ✅ Middleware para preflight y JSON
-app.options('*', cors());
-app.use(express.json());
+// 🌐 Middleware
+app.options('*', cors()); // Preflight
+app.use(express.json());  // JSON parser
 
-// 📦 Rutas y modelos
+// 📦 Modelos y rutas
 const User = require('./models/User');
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
-// 🔍 Ruta pública para probar
+// 📍 Ruta pública de prueba
 app.get('/', async (req, res) => {
   try {
     const users = await User.find().select('-password');
@@ -54,7 +55,18 @@ app.get('/', async (req, res) => {
   }
 });
 
-// ✅ Conexión a MongoDB y levantamiento del servidor
+// ⚠️ Ruta no encontrada
+app.use((req, res, next) => {
+  res.status(404).json({ message: 'Ruta no encontrada' });
+});
+
+// 🚨 Manejo de errores globales
+app.use((err, req, res, next) => {
+  console.error('❌ Error global:', err.stack);
+  res.status(500).json({ message: 'Error interno del servidor', error: err.message });
+});
+
+// 🔌 Conexión a MongoDB y levantamiento del servidor
 mongoose.connect(process.env.MONGO_URI, {
   dbName: 'gymflow',
 })
@@ -62,8 +74,6 @@ mongoose.connect(process.env.MONGO_URI, {
   console.log('🟢 Conectado a MongoDB');
 
   const PORT = process.env.PORT || 8080;
-
-  // ✅ Escuchar en todas las interfaces (requerido por Railway)
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
   });
