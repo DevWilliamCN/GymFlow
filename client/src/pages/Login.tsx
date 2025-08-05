@@ -35,7 +35,7 @@ const Login = () => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      toast.error('⚠️ Demasiados intentos fallidos. Intenta de nuevo en unos minutos.');
+      toast.error('⚠️ No se pudo conectar con el servidor');
     }
   };
 
