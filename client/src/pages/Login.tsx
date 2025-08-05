@@ -10,7 +10,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  // 🔐 URL de tu backend en Railway, viene del .env
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -27,6 +26,8 @@ const Login = () => {
 
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user)); // Guarda datos del usuario
+
         toast.success('✅ Inicio de sesión exitoso');
         setTimeout(() => navigate('/dashboard'), 1500);
       } else {
@@ -46,7 +47,6 @@ const Login = () => {
     <div className={styles.loginContainer}>
       <form onSubmit={handleLogin} className={styles.loginForm}>
         <h2 className={styles.title}>GymFlow Login 🚀</h2>
-
 
         <div className={styles.inputGroup}>
           <label className={styles.label}>Correo</label>
@@ -89,13 +89,21 @@ const Login = () => {
         >
           Iniciar sesión con Google
         </button>
+
+        <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+          ¿No tienes cuenta?{' '}
+          <span
+            onClick={() => navigate('/register')}
+            style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            Regístrate
+          </span>
+        </p>
       </form>
 
-      {/* Mensajes flotantes */}
       <ToastContainer position="top-center" autoClose={2000} hideProgressBar />
     </div>
   );
 };
-
 
 export default Login;

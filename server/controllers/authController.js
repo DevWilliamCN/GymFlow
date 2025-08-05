@@ -3,24 +3,42 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { firstName, lastName, dateOfBirth, email, password } = req.body;
 
   try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Usuario ya existe' });
+    // Validaciones
+    if (!firstName || !lastName || !dateOfBirth || !email || !password) {
+      return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const parsedDate = new Date(dateOfBirth);
+    if (isNaN(parsedDate)) {
+      return res.status(400).json({ message: 'Fecha de nacimiento inválida' });
+    }
 
-    const newUser = new User({ name, email, password: hashedPassword });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.status(400).json({ message: 'Usuario ya existe' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      firstName,
+      lastName,
+      dateOfBirth: parsedDate,
+      email,
+      password: hashedPassword,
+    });
+
     await newUser.save();
 
-    res.status(201).json({ message: 'Usuario registrado correctamente' });
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+
+    res.status(201).json({ message: 'Usuario registrado correctamente', token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error registrando usuario' });
+    console.error('❌ Error en register:', err.message);
+    res.status(500).json({ message: 'Error interno al registrar', error: err.message });
   }
 };
 
@@ -45,13 +63,14 @@ const login = async (req, res) => {
       token,
       user: {
         id: user._id,
-        name: user.name,
-        email: user.email
-      }
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error al iniciar sesión' });
+    console.error('❌ Error en login:', err.message);
+    res.status(500).json({ message: 'Error al iniciar sesión', error: err.message });
   }
 };
 
