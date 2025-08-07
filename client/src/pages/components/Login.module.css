@@ -111,7 +111,6 @@
   height: 20px;
 }
 
-
 /* Animación de entrada */
 @keyframes fadeIn {
   from {
@@ -121,5 +120,39 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* ✅ RESPONSIVE para móviles */
+@media (max-width: 480px) {
+  .loginForm {
+    padding: 1.5rem;
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: none;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .inputWrapper {
+    flex-direction: row;
+    padding-left: 0.25rem;
+  }
+
+  .icon {
+    font-size: 0.9rem;
+    padding-right: 0.25rem;
+  }
+
+  .inputField {
+    font-size: 0.95rem;
+  }
+
+  .button,
+  .googleButton {
+    font-size: 0.95rem;
+    padding: 0.65rem;
   }
 }

@@ -7,7 +7,7 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Obtener datos protegidos del backend
+  // Obtener datos protegidos
   useEffect(() => {
     const obtenerDatosProtegidos = async () => {
       const token = localStorage.getItem('token');
@@ -25,14 +25,7 @@ const Dashboard = () => {
         });
 
         if (res.status === 200) {
-          setNombre(res.data.name);
-
-          // ✅ Mostrar bienvenida solo si está marcada
-          const mostrarBienvenida = localStorage.getItem('mostrarBienvenida');
-          if (mostrarBienvenida === 'true') {
-            toast.success(`Bienvenido ${res.data.name}, un gusto verte de nuevo.`);
-            localStorage.removeItem('mostrarBienvenida');
-          }
+          setNombre(res.data.name); // 👈 Guardamos el nombre
         } else {
           setError('Error al obtener datos protegidos');
         }
@@ -46,6 +39,15 @@ const Dashboard = () => {
 
     obtenerDatosProtegidos();
   }, []);
+
+  // ✅ Mostrar mensaje de bienvenida después de tener el nombre
+  useEffect(() => {
+    const mostrarBienvenida = localStorage.getItem('mostrarBienvenida');
+    if (nombre && mostrarBienvenida === 'true') {
+      toast.success(`Bienvenido ${nombre}, un gusto verte de nuevo.`);
+      localStorage.removeItem('mostrarBienvenida');
+    }
+  }, [nombre]);
 
   return (
     <div style={{ padding: '2rem', position: 'relative' }}>
@@ -69,7 +71,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Mostrar error */}
+      {/* Error */}
       {!loading && error && <p style={{ color: 'red' }}>❌ {error}</p>}
 
       {/* Contenido */}
