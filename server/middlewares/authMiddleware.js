@@ -9,9 +9,13 @@ module.exports = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.id || decoded.userId;
+
+    // Usamos siempre "userId", que es como lo firmas en el login
+    req.userId = decoded.userId;
+
     next();
   } catch (err) {
+    console.error('❌ Error al verificar el token:', err.message);
     res.status(401).json({ message: 'Token inválido o expirado.' });
   }
 };

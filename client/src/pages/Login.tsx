@@ -26,10 +26,11 @@ const Login = () => {
 
       if (res.ok && data.token) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user)); // Guarda datos del usuario
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('mostrarBienvenida', 'true'); // ✅ MARCA PARA DASHBOARD
 
         toast.success('✅ Inicio de sesión exitoso');
-        setTimeout(() => navigate('/dashboard'), 1500);
+        setTimeout(() => navigate('/dashboard'), 1000);
       } else {
         toast.error(`❌ ${data.message || data.error || 'Credenciales inválidas'}`);
       }
@@ -78,9 +79,7 @@ const Login = () => {
           </div>
         </div>
 
-        <button type="submit" className={styles.button}>
-          Entrar
-        </button>
+        <button type="submit" className={styles.button}>Entrar</button>
 
         <button
           type="button"
@@ -107,3 +106,4 @@ const Login = () => {
 };
 
 export default Login;
+

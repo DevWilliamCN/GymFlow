@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// Registro de usuario
 const register = async (req, res) => {
   const { firstName, lastName, dateOfBirth, email, password } = req.body;
 
@@ -30,7 +31,7 @@ const register = async (req, res) => {
 
     await newUser.save();
 
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: '1d',
     });
 
@@ -41,6 +42,7 @@ const register = async (req, res) => {
   }
 };
 
+// Login
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -73,8 +75,20 @@ const login = async (req, res) => {
   }
 };
 
-const protectedRoute = (req, res) => {
-  res.status(200).json({ message: 'Ruta protegida accedida correctamente' });
+// Ruta protegida (modificada)
+const protectedRoute = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('firstName');
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+
+    res.status(200).json({
+      message: 'Ruta protegida accedida correctamente',
+      name: user.firstName,
+    });
+  } catch (err) {
+    console.error('❌ Error en ruta protegida:', err.message);
+    res.status(500).json({ message: 'Error al acceder a la ruta protegida' });
+  }
 };
 
 module.exports = { register, login, protectedRoute };
